@@ -516,6 +516,7 @@ Gas sponsorship via the relayer reduces friction for users and hosts in regions 
 
 ---
 
+
 ## 4. OpenWrt Router Implementation
 
 ### 4.1 Router Software Architecture
@@ -735,7 +736,11 @@ All files               99.1      95.4       100       100
 | Batch payment O(n²) complexity | Medium | Documented | Acceptable for batch size < 50 |
 | Missing event on `setPaymentAddress()` | Low | Fixed | Added `PaymentAddressUpdated` event |
 
-### 5.3 Security Features
+ ### 5.2.1 Audit Link
+ - Audit Report: [Audit Report](docs/audit_report.md)
+ - Audit Implementation: [Audit Implementation Notes](docs/audit_implementation_notes.md)
+
+ ### 5.3 Security Features
 
 **Access Control:**
 ```solidity
@@ -804,202 +809,54 @@ function rescueERC20(address token, uint256 amount) external onlyOwner {
 
 ### 6.1 Client Application (zaanet.xyz)
 
-The client application at zaanet.xyz is the public-facing platform where users discover networks and purchase vouchers. Users can browse available WiFi networks by location, view details such as host, rating, and price, and filter by price, rating, and availability, with real-time network status. Voucher purchase is supported in two ways: via mobile money (e.g. MTN, Vodafone) for instant voucher delivery, or via USDT by connecting a Web3 wallet (MetaMask, WalletConnect), choosing duration (1 hr, 6 hr, or 24 hr), and paying on Arbitrum; both options result in instant voucher generation. The user dashboard shows active sessions, purchase history, saved networks, and usage statistics.
+The client application at [zaanet.xyz](https://www.zaanet.xyz) is the public-facing platform where users discover networks and purchase vouchers. Users can browse available WiFi networks by location, view details such as host, rating, and price, and filter by price, rating, and availability, with real-time network status. Voucher purchase is supported in two ways: via mobile money (e.g. MTN, Vodafone) for instant voucher delivery, or via USDT by using the in-app crypto wallets, choosing duration (1 hr, 6 hr, or 24 hr), and paying on Arbitrum; both options result in instant voucher generation. The user dashboard shows active sessions, purchase history, saved networks, and usage statistics.
 
-**Screenshot Placeholders:**
-```
-[Home Page - Network Map]
-[Voucher Purchase Flow]
-[User Dashboard]
-```
+#### User Dashboard
+![User Dashboard](screenshots/user_dashboard.png)
 
-**Technical Stack:**
-```typescript
-// Next.js 15 with App Router
-// app/page.tsx
-export default async function HomePage() {
-  const networks = await getNetworks();
-  
-  return (
-    <main>
-      <Hero />
-      <NetworkMap networks={networks} />
-      <HowItWorks />
-      <Features />
-    </main>
-  );
-}
+#### Voucher Purchase
+![Voucher Purchase](screenshots/voucher_purchase_page.png)
 
-// Web3 Integration with Wagmi
-import { useWriteContract } from 'wagmi';
-
-function PurchaseVoucher() {
-  const { writeContract } = useWriteContract();
-  
-  const buyVoucher = async (networkId, duration) => {
-    await writeContract({
-      address: PAYMENT_CONTRACT,
-      abi: ZaaNetPaymentABI,
-      functionName: 'processPayment',
-      args: [voucherId, hostAddress, amount]
-    });
-  };
-}
-```
+#### Crypto Wallet
+![Crypto Wallet](screenshots/crypto_wallet.png)
 
 ### 6.2 Host Application (host.zaanet.xyz)
 
-The host application at host.zaanet.xyz is the dashboard for network owners to manage their WiFi hotspots. Hosts can register new networks, update details (name, location, price), configure router settings, and see whether each network is online or offline. The earnings dashboard shows total earnings in real time, daily/weekly/monthly breakdowns, transaction history, and the option to withdraw to a wallet. Analytics include active sessions, total users served, peak usage times, and revenue trends. Router management provides access to installation materials (scripts are currently local; a flashable installer for non-technical users is planned for a later phase), router status, remote configuration, and firmware updates.
+The host application at [host.zaanet.xyz](https://host.zaanet.xyz) is the dashboard for network owners to manage their WiFi hotspots. Hosts can register new networks, update details (name, location, price), configure router settings, and see whether each network is online or offline. The earnings dashboard shows total earnings in real time, daily/weekly/monthly breakdowns, transaction history, that appear right in the host wallet. Analytics include active sessions, total users served, peak usage times, and revenue trends. Router management provides access to installation materials, router status, remote configuration, and firmware updates.
 
-**Screenshot Placeholders:**
-```
-[Host Dashboard Overview]
-[Earnings Analytics]
-[Network Registration]
-```
+#### Host Dashboard
+![Host Dashboard](screenshots/host_dashboard.png)
 
-**Sample Dashboard:**
-```typescript
-// Host Dashboard Component
-interface DashboardStats {
-  totalEarnings: string;
-  activeSessions: number;
-  totalUsers: number;
-  monthlyRevenue: string;
-}
+#### Host Earnings
+![Host Earnings](screenshots/host_earnings.png)
 
-function HostDashboard({ stats }: { stats: DashboardStats }) {
-  return (
-    <div className="grid grid-cols-4 gap-6">
-      <StatCard
-        title="Total Earnings"
-        value={stats.totalEarnings}
-        icon={<DollarIcon />}
-        trend="+12.5%"
-      />
-      <StatCard
-        title="Active Sessions"
-        value={stats.activeSessions}
-        icon={<UsersIcon />}
-      />
-      <StatCard
-        title="Total Users"
-        value={stats.totalUsers}
-        icon={<NetworkIcon />}
-      />
-      <StatCard
-        title="Monthly Revenue"
-        value={stats.monthlyRevenue}
-        icon={<TrendingUpIcon />}
-        trend="+23.1%"
-      />
-    </div>
-  );
-}
-```
+#### Host Wallet
+![Host Wallet](screenshots/host_wallet.png)
+
+#### Host Voucher generation page
+![Host Voucher generation page](screenshots/host_vouchers.png)
 
 ### 6.3 Admin Application (admin.zaanet.xyz)
 
-The admin application at admin.zaanet.xyz supports platform administration and monitoring. It provides analytics on total networks registered, vouchers sold, platform revenue, and active versus inactive networks. Network management allows staff to approve or reject network registrations, suspend problematic networks, update platform fees, and manage treasury. User management includes viewing all users, suspending or banning accounts, viewing transaction history, and a support ticket system. System monitoring covers smart contract events, API health, router online/offline status, and error logs.
+The admin application at admin.zaanet.xyz [admin.zaanet.xyz](https://admin.zaanet.xyz) supports platform administration and monitoring. It provides analytics on total networks registered, vouchers sold, platform revenue, and active versus inactive networks. Network management allows staff to approve or reject network registrations, suspend problematic networks, update platform fees, and manage treasury. User management includes viewing all users, suspending or banning accounts, viewing transaction history, and a support ticket system. System monitoring covers smart contract events, API health, router online/offline status, and error logs.
 
-**Screenshot Placeholders:**
-```
-[Admin Dashboard]
-[Network Management]
-[Platform Analytics]
-```
+#### Admin Dashboard
+![Admin Dashboard](screenshots/admin_dashboard.png)
 
-**Admin Dashboard Code:**
-```typescript
-// Real-time monitoring with WebSockets
-function AdminDashboard() {
-  const [platformStats, setPlatformStats] = useState<PlatformStats>();
-  
-  useEffect(() => {
-    const ws = new WebSocket('wss://api.zaanet.xyz/admin/stats');
-    
-    ws.onmessage = (event) => {
-      const stats = JSON.parse(event.data);
-      setPlatformStats(stats);
-    };
-    
-    return () => ws.close();
-  }, []);
-  
-  return (
-    <AdminLayout>
-      <StatsGrid stats={platformStats} />
-      <NetworksTable />
-      <RecentTransactions />
-      <SystemHealth />
-    </AdminLayout>
-  );
-}
-```
+#### Admin Contract Monitoring 
+![Admin Contract Monitoring](screenshots/contract_monitor.png)
+
+#### Platform Transactions
+![Platform Transactions](screenshots/transactions.png)
+
+#### App Settings
+![App Settings](screenshots/settings.png)
 
 ---
 
 ## 7. Real-World Testing Results
 
-### 7.1 Testing Phases
-
-```mermaid
-gantt
-    title Testing Timeline
-    dateFormat YYYY-MM-DD
-    section Alpha Testing
-    Internal Team         :2024-12-01, 2024-12-15
-    Bug Fixes            :2024-12-16, 2024-12-31
-    section Beta Testing
-    Limited Hosts (5)    :2025-01-01, 2025-01-15
-    Real Users (50)      :2025-01-16, 2025-01-31
-    section Production
-    Public Launch        :2025-02-01, 2025-02-15
-```
-
-### 7.2 Beta Testing Metrics
-
-**Host Demographics:**
-| Location | Hosts | Users Served | Uptime | Avg Rating |
-|----------|-------|--------------|--------|------------|
-| Accra, Ghana | 3 | 127 | 98.2% | 4.5/5.0 |
-| Kumasi, Ghana | 2 | 83 | 96.8% | 4.3/5.0 |
-| **Total** | **5** | **210** | **97.5%** | **4.4/5.0** |
-
-**Usage Statistics:**
-- **Total Sessions:** 210
-- **Average Session Duration:** 4.2 hours
-- **Total Data Transferred:** 45.3 GB
-- **Peak Concurrent Users:** 12
-- **Success Rate:** 96.7% (203/210 successful authentications)
-
-**Revenue Metrics:**
-- **Total Vouchers Sold:** 210
-- **Average Voucher Price:** $0.50 (0.50 USDT)
-- **Total Platform Revenue:** $105 (5% of $2,100)
-- **Total Host Earnings:** $1,995 (95% of $2,100)
-- **Platform Fee Collected:** $105 (5%)
-
-### 7.3 Performance Benchmarks
-
-**Router Performance:**
-| Metric | Value | Benchmark |
-|--------|-------|-----------|
-| **Average Authentication Time** | 2.3 seconds | Target: <5s |
-| **Splash Page Load Time** | 1.1 seconds | Target: <2s |
-| **API Response Time** | 320ms | Target: <500ms |
-| **Router Uptime** | 97.5% | Target: >95% |
-| **Concurrent Sessions (max)** | 8 | Hardware Limit: 10 |
-
-**Smart Contract Gas Costs:**
-| Function | Gas Used | Cost (at 0.1 gwei) |
-|----------|----------|-------------------|
-| `processPayment()` | ~85,000 | $0.0085 |
-| `registerNetwork()` | ~120,000 | $0.012 |
-| `updateNetwork()` | ~45,000 | $0.0045 |
-| `batchPayment(10)` | ~650,000 | $0.065 |
-
-### 7.4 Issues Encountered & Resolutions
+### 7.1 Issues Encountered & Resolutions
 
 | Issue | Severity | Resolution | Status |
 |-------|----------|------------|--------|
@@ -1009,515 +866,36 @@ gantt
 | Session dashboard not auto-refreshing | Low | Added 30s polling | Fixed |
 | Duplicate MAC addresses in whitelist | Medium | Added validation in install script | Fixed |
 
-### 7.5 User Feedback
-
-**Positive Feedback:**
-> "Super easy to use! Connected in seconds and the internet was fast." - User in Accra  
-> 5/5
-
-> "As a host, I love seeing my earnings grow every day. The dashboard is very clear." - Host in Kumasi  
-> 5/5
-
-**Constructive Feedback:**
-> "Would be nice to have a mobile app instead of web-only." - User suggestion  
-> _Response: Mobile app is on the roadmap for Q3 2025_
-
-> "Installation was a bit technical. Need better video guides." - New host  
-> _Response: Created comprehensive video tutorial series_
-
----
-
-## 8. User Experience Flow
-
-### 8.1 End-to-End User Journey
-
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant W as Wallet
-    participant ZN as zaanet.xyz
-    participant SC as Smart Contract
-    participant R as Router
-    participant API as Backend API
-    
-    U->>ZN: Browse networks
-    ZN-->>U: Show available networks
-    U->>ZN: Select network & duration
-    alt Pay with USDT
-        ZN->>W: Request wallet connection
-        W-->>ZN: Connected (address)
-        U->>ZN: Click "Purchase Voucher"
-        ZN->>W: Request USDT approval
-        W-->>ZN: Approved
-        ZN->>SC: processPayment(voucherId, host, amount)
-        SC-->>API: Event: PaymentProcessed
-    else Pay with mobile money
-        U->>ZN: Choose mobile money
-        ZN->>API: Initiate mobile money payment
-        API-->>U: Payment instructions / redirect
-        U->>API: Complete mobile money payment
-        API->>API: Confirm payment, generate voucher
-    end
-    API->>API: Generate voucher code
-    API-->>ZN: Voucher: ZNET-XXXX-XXXX-XXXX
-    ZN-->>U: Display voucher
-    U->>R: Connect to WiFi
-    R-->>U: Redirect to captive portal
-    U->>R: Enter voucher code (submit splash form)
-    R->>R: Nodogsplash invokes BinAuth script
-    R->>API: BinAuth calls POST /api/v1/portal/sessions/start
-    API-->>R: Valid + session details
-    R->>R: BinAuth returns allow; Nodogsplash authenticates MAC
-    R-->>U: Internet access granted
-    U->>R: Browse session dashboard
-    R-->>U: Show remaining time/data
-```
-
-### 8.2 Detailed Flow Screenshots
-
-**Step 1: Network Discovery**
-```
-[Screenshot: zaanet.xyz home page with map showing available networks]
-
-┌─────────────────────────────────────────┐
-│ ZaaNet - Discover WiFi Networks        │
-├─────────────────────────────────────────┤
-│                                          │
-│  [Interactive Map - Ghana]               │
-│  Accra (3 networks)                      │
-│  Kumasi (2 networks)                     │
-│                                          │
-│  ┌──────────────────────────────┐      │
-│  │ ZN-Test 4.4                   │      │
-│  │ Accra, Ghana                  │      │
-│  │ $0.50/hour | Host: PayTrier   │      │
-│  │ [View Details]                │      │
-│  └──────────────────────────────┘      │
-│                                          │
-└─────────────────────────────────────────┘
-```
-
-**Step 2: Voucher Purchase**
-```
-[Screenshot: Purchase modal with payment method choice]
-
-┌─────────────────────────────────────────┐
-│ Purchase Voucher - ZN-Test              │
-├─────────────────────────────────────────┤
-│ Network: ZN-Test                         │
-│ Location: Accra, Ghana                   │
-│ Host: PayTrier 4.4                       │
-│                                          │
-│ Duration:                                │
-│ ○ 1 Hour - $0.50                        │
-│ ● 6 Hours - $2.00  [Save 33%]          │
-│ ○ 24 Hours - $5.00  [Save 58%]         │
-│                                          │
-│ Pay with:  Mobile money  |  USDT        │
-│ (Mobile money or connect wallet)        │
-│                                          │
-│ [Pay with Mobile Money] [Connect Wallet]│
-└─────────────────────────────────────────┘
-```
-
-**Step 3: Voucher Received**
-```
-[Screenshot: Success message with voucher code]
-
-┌─────────────────────────────────────────┐
-│ Purchase Successful!                   │
-├─────────────────────────────────────────┤
-│                                          │
-│ Your Voucher Code:                       │
-│                                          │
-│  ┌──────────────────────────────┐      │
-│  │   ZNET-AB12-CD34-EF56        │      │
-│  │   [Copy]  [QR Code]          │      │
-│  └──────────────────────────────┘      │
-│                                          │
-│ Valid for: 6 hours                       │
-│ Network: ZN-Test                         │
-│                                          │
-│ Instructions:                            │
-│ 1. Connect to "ZaaNet" WiFi             │
-│ 2. Enter this code when prompted        │
-│ 3. Enjoy your internet!                 │
-│                                          │
-│ [View in Dashboard]  [Done]             │
-└─────────────────────────────────────────┘
-```
-
-**Step 4: Captive Portal**
-```
-[Screenshot: Router splash page]
-
-┌─────────────────────────────────────────┐
-│ ZaaNet                                  │
-│ Decentralized WiFi Sharing              │
-├─────────────────────────────────────────┤
-│                                          │
-│ Network: ZN-Test                         │
-│ Location: Accra, Ghana                   │
-│ Host: PayTrier 4.4 (9 reviews)           │
-│                                          │
-│ ─────────────────────────────────       │
-│                                          │
-│ Welcome! Enter your voucher code        │
-│ below to access the internet.           │
-│                                          │
-│ Voucher Code:                            │
-│ ┌──────────────────────────────┐        │
-│ │ ZNET-____-____-____          │        │
-│ └──────────────────────────────┘        │
-│                                          │
-│ [Connect to Internet]                   │
-│                                          │
-│ Don't have a voucher?                   │
-│ [Buy Voucher Here →]                    │
-│                                          │
-└─────────────────────────────────────────┘
-```
-
-**Step 5: Active Session**
-```
-[Screenshot: Session dashboard]
-
-┌─────────────────────────────────────────┐
-│ ZaaNet Active Session                   │
-├─────────────────────────────────────────┤
-│ Network: ZN-Test                         │
-│ Host: PayTrier 4.4                       │
-│                                          │
-│ Time Remaining:                          │
-│ ┌──────────────────────────────┐        │
-│ │ 5h 23m                        │        │
-│ │ [████████████████░░░░] 90%    │        │
-│ └──────────────────────────────┘        │
-│                                          │
-│ Data Used: 156 MB                       │
-│ Speed: ↓ 12.3 Mbps | ↑ 5.1 Mbps        │
-│ IP Address: 192.168.8.145               │
-│                                          │
-│ [Rate This Network]  [End Session]      │
-│                                          │
-│ Auto-refreshing...                      │
-└─────────────────────────────────────────┘
-```
-
----
-
-## 9. Performance Metrics & Analytics
-
-### 9.1 System-Wide Metrics (Production)
-
-**Current Statistics (as of Feb 2025):**
-
-```
-┌─────────────────────────────────────────┐
-│ ZaaNet Platform Statistics              │
-├─────────────────────────────────────────┤
-│ Total Networks:           5              │
-│ Active Networks:          5 (100%)       │
-│ Total Hosts:              5              │
-│ Total Users:              210            │
-│ Total Sessions:           210            │
-│ Total Revenue:            $2,100         │
-│ Platform Earnings:        $105 (5%)      │
-│ Host Earnings:            $1,995 (95%)   │
-│ Avg Session Duration:     4.2 hours      │
-│ Total Data Transferred:   45.3 GB        │
-└─────────────────────────────────────────┘
-```
-
-### 9.2 Growth Trends
-
-**Weekly Growth (Last 4 Weeks):**
-
-```
-Week 1: 15 sessions  ($75 revenue)
-Week 2: 35 sessions  ($175 revenue)  ↑ 133%
-Week 3: 68 sessions  ($340 revenue)  ↑ 94%
-Week 4: 92 sessions  ($460 revenue)  ↑ 35%
-────────────────────────────────────────────
-Total:  210 sessions ($1,050 revenue)
-```
-
-**User Acquisition:**
-```
-Organic (Search):        45%
-Referral:                30%
-Social Media:            15%
-Direct:                  10%
-```
-
-### 9.3 Network Performance Matrix
-
-**Top Performing Networks:**
-
-| Network | Location | Sessions | Revenue | Rating | Uptime |
-|---------|----------|----------|---------|--------|--------|
-| ZN-Test | Accra | 85 | $425 | 4.4/5 | 99.1% |
-| ZN-Kumasi-1 | Kumasi | 52 | $260 | 4.5/5 | 98.2% |
-| ZN-Accra-2 | Accra | 42 | $210 | 4.3/5 | 96.5% |
-| ZN-Kumasi-2 | Kumasi | 31 | $155 | 4.3/5 | 97.8% |
-
-### 9.4 Transaction Analytics
-
-**Voucher Duration Distribution:**
-```
-1 Hour:   42 vouchers (20%)  ├████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-6 Hours:  105 vouchers (50%) ├██████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░
-24 Hours: 63 vouchers (30%)  ├███████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-```
-
-**Payment Success Rate:**
-```
-Successful:     203 (96.7%) ├████████████████████████████████████████████████████
-Failed:         7 (3.3%)    ├██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-```
-
-**Failure Reasons:**
-- Insufficient USDT balance: 4 (57%)
-- Transaction rejected: 2 (29%)
-- Network error: 1 (14%)
-
-### 9.5 Cost Analysis
-
-**Platform Operating Costs:**
-
-| Category | Monthly Cost | Details |
-|----------|--------------|---------|
-| **Server Hosting** | $50 | DigitalOcean/AWS |
-| **Domain & SSL** | $5 | zaanet.xyz + subdomains |
-| **Database** | $25 | MongoDB Atlas |
-| **Gas Fees** | $15 | Arbitrum mainnet |
-| **Monitoring** | $10 | Sentry, analytics |
-| **Total** | **$105/month** | |
-
-**Break-Even Analysis:**
-- Platform fee: 5% of transactions
-- Required monthly volume: $2,100 in voucher sales
-- Current monthly volume: ~$1,050 (month 1)
-- **Projected break-even: Month 2**
-
----
-
-## 10. Security & Compliance
-
-### 10.1 Security Measures Implemented
-
-**Smart Contract Security:**
-- OpenZeppelin security primitives
-- ReentrancyGuard on critical functions
-- Access control with allowedCallers
-- Pausable for emergency stops
-- Daily payment limits
-- Voucher idempotency checks
-- Safe ERC20 transfers
-
-**Backend Security:**
-- JWT authentication
-- Rate limiting (100 req/min)
-- Input validation (class-validator)
-- SQL injection prevention (MongoDB)
-- XSS protection
-- CORS configuration
-- Helmet.js security headers
-- Encrypted secrets (environment variables)
-
-**Router Security:**
-- SSH key authentication
-- Firewall configuration
-- Admin device whitelisting
-- Secure WiFi isolation
-- Regular security updates
-
-**Data Privacy:**
-- Minimal data collection
-- No personal information required
-- Session data deleted after 30 days
-- GDPR-compliant (for EU users)
-
-### 10.2 Vulnerability Testing Results
-
-**OWASP Top 10 Assessment:**
-
-| Vulnerability | Risk | Status | Mitigation |
-|---------------|------|--------|------------|
-| A01: Broken Access Control | Medium | Addressed | Role-based access, JWT tokens |
-| A02: Cryptographic Failures | Low | Addressed | HTTPS, encrypted storage |
-| A03: Injection | Medium | Addressed | Input validation, parameterized queries |
-| A04: Insecure Design | Low | Addressed | Security by design principles |
-| A05: Security Misconfiguration | Low | Addressed | Secure defaults, regular audits |
-| A06: Vulnerable Components | Low | Addressed | Regular dependency updates |
-| A07: Auth Failures | Medium | Addressed | Strong JWT, wallet signatures |
-| A08: Software & Data Integrity | Low | Addressed | Smart contract immutability |
-| A09: Logging Failures | Low | Addressed | Comprehensive audit logs |
-| A10: Server-Side Request Forgery | Low | Addressed | Input validation, whitelist |
-
-### 10.3 Compliance & Legal
-
-**Regulatory Compliance:**
-- Terms of Service
-- Privacy Policy
-- Cookie Policy
-- Acceptable Use Policy
-- FinCEN MSB registration (if required)
-- Local telecom licenses (per jurisdiction)
-
-**Data Protection:**
-- GDPR compliance (EU)
-- CCPA compliance (California)
-- Data retention policies
-- Right to deletion
-- Data portability
-
----
-
-## 11. Deployment & Operations
-
-### 11.1 Infrastructure Architecture
-
-```mermaid
-graph TB
-    subgraph "Frontend - Vercel"
-        A[zaanet.xyz]
-        B[host.zaanet.xyz]
-        C[admin.zaanet.xyz]
-    end
-    
-    subgraph "Backend - AWS/DigitalOcean"
-        D[NestJS API]
-        E[MongoDB Atlas]
-        F[Redis Cache]
-    end
-    
-    subgraph "Blockchain - Arbitrum"
-        G[Smart Contracts]
-        H[Arbitrum RPC]
-    end
-    
-    subgraph "Router Network"
-        I[OpenWrt Routers]
-        J[Stats Collector]
-    end
-    
-    A --> D
-    B --> D
-    C --> D
-    D --> E
-    D --> F
-    D --> H
-    H --> G
-    I --> D
-    I --> J
-    J --> D
-```
-
-### 11.2 Deployment Checklist
-
-**Pre-Deployment:**
-- [x] All tests passing (64/64)
-- [x] Security audit completed
-- [x] Environment variables configured
-- [x] Database backups enabled
-- [x] Monitoring setup (Sentry)
-- [x] SSL certificates installed
-- [x] Domain DNS configured
-- [x] CDN enabled (Vercel Edge)
-
-**Smart Contract Deployment:**
-- [x] Testnet deployment verified
-- [x] Mainnet deployment script ready
-- [x] USDT token address confirmed
-- [x] Treasury wallet secured
-- [x] Multisig setup (optional)
-- [x] Contract verification on Arbiscan
-- [x] Emergency pause procedures documented
-
-**Application Deployment:**
-- [x] Frontend deployed to Vercel
-- [x] Backend deployed to production server
-- [x] Database migrations run
-- [x] Environment variables set
-- [x] Health checks passing
-- [x] Load testing completed
-
-### 11.3 Monitoring & Alerting
-
-**Monitoring Tools:**
-- **Uptime:** UptimeRobot (99.9% SLA)
-- **Errors:** Sentry (real-time error tracking)
-- **Analytics:** Google Analytics, Mixpanel
-- **Blockchain:** Tenderly (contract monitoring)
-- **Performance:** New Relic APM
-
-**Alert Thresholds:**
-- API response time > 1s
-- Error rate > 1%
-- Uptime < 99%
-- Smart contract pause event
-- Daily payment limit reached
-- Router offline > 30 minutes
-
-### 11.4 Backup & Recovery
-
-**Database Backups:**
-- Automated daily backups (MongoDB Atlas)
-- 30-day retention period
-- Point-in-time recovery enabled
-- Offsite backup storage (S3)
-
-**Smart Contract Recovery:**
-- Emergency pause mechanism
-- Owner-controlled rescue functions
-- Multisig for critical operations
-- Upgrade path via proxy pattern (future)
-
-**Disaster Recovery Plan:**
-- RTO (Recovery Time Objective): 4 hours
-- RPO (Recovery Point Objective): 24 hours
-- Documented runbooks
-- Regular DR drills
-
 ---
 
 ## 12. Future Roadmap
 
-### 12.1 Q2 2025 (Apr-Jun)
+
+### 12.1 Q2 2026 (Apr-Jun)
+
+**Primary Focus:**
+- [ ] Intensive pilot testing in target regions
+- [ ] Comprehensive bug fixing and issue resolution
+- [ ] User feedback collection and iteration
+
+### 12.2 Q3 2026 (Jul-Sep)
 
 **Features:**
-- [ ] Mobile App (React Native)
 - [ ] Additional router models support
-- [ ] Multi-currency support (ETH, ARB)
 - [ ] Referral program
 - [ ] Host verification system
-
-**Infrastructure:**
-- [ ] **Flashable / simplified router installer** — Publish and simplify installation so non-technical users can set up a ZaaNet hotspot (e.g. flashable image or one-step flow) without SSH or command-line; scripts are currently local and under active improvement.
+- [ ] Flashable / simplified router installer
 - [ ] Load balancer deployment
-- [ ] Multi-region servers
 - [ ] Advanced analytics dashboard
 - [ ] Automated router provisioning
 
-### 12.2 Q3 2025 (Jul-Sep)
-
-**Features:**
-- [ ] DAO governance launch
-- [ ] Staking program for hosts
-- [ ] Dynamic pricing algorithm
-- [ ] Quality-of-service guarantees
-- [ ] IoT device support
-
 **Expansion:**
-- [ ] Nigeria market entry
-- [ ] Kenya market entry
+- [ ] Ghana market expansion (beyond Northern region)
 - [ ] 100+ active networks target
 
-### 12.3 Q4 2025 (Oct-Dec)
+### 12.3 Q4 2026 (Oct-Dec)
 
 **Features:**
-- [ ] Cross-chain support (Polygon, Base)
 - [ ] NFT-based network ownership
 - [ ] Mesh networking pilot
 - [ ] Enterprise/business plans
@@ -1531,8 +909,8 @@ graph TB
 ### 12.4 2026 and Beyond
 
 **Vision:**
-- Global WiFi sharing network
-- Decentralized autonomous organization
+- Africa wide WiFi sharing network
+- Utility token for rewards and governance
 - Hardware manufacturing partnership
 - Satellite backhaul integration
 - Web3 social features
@@ -1555,13 +933,11 @@ graph TB
 
 **User Device:**
 - Browser: Chrome 90+, Firefox 88+, Safari 14+
-- Wallet: MetaMask, WalletConnect-compatible
 - Network: WiFi 802.11b/g/n
 
 **Host Requirements:**
 - Internet: 5 Mbps minimum upload
 - Router: OpenWrt-compatible device
-- Wallet: Web3 wallet with USDT
 - Location: Physical address for network registration
 
 ### Appendix B: API Documentation
@@ -1627,8 +1003,6 @@ sh /tmp/install/install-zaanet.sh /tmp
 # 5. Save the generated Router ID; register it with the Contract ID on the ZaaNet platform
 ```
 
-**Full documentation:** `install/docs/INSTALLATION_GUIDE.md`
-
 ### Appendix D: Smart Contract ABIs
 
 **ZaaNetPayment.sol:**
@@ -1647,8 +1021,6 @@ sh /tmp/install/install-zaanet.sh /tmp
   }
 }
 ```
-
-**Full ABIs:** `smart-contracts/artifacts/`
 
 ### Appendix E: Glossary
 
@@ -1669,19 +1041,17 @@ sh /tmp/install/install-zaanet.sh /tmp
 ### Appendix F: Support & Resources
 
 **Documentation:**
-- Installation Guide: `install/docs/INSTALLATION_GUIDE.md`
-- API Documentation: `server/README.md`
-- Smart Contract Docs: `smart-contracts/README.md`
+- [Installation Guide](install/docs/installation_guide.md)
+- [Uninstallation Guide](install/docs/uninstall_guide.md)
+- API Documentation: [Server information](docs/server.md)
+- Smart Contract Docs: [Smart Contract information](zaanet-smart-contracts/README.md)
 
 **Community:**
-- Discord: https://discord.gg/zaanet
-- Telegram: https://t.me/zaanet
-- Twitter: https://twitter.com/zaanetxyz
+- Telegram: https://t.me/+wS2TymNwrJBmNjA0
+- Twitter: https://x.com/ZaaNet_
 
 **Support:**
-- Email: support@zaanet.xyz
-- Docs: https://docs.zaanet.xyz
-- Status Page: https://status.zaanet.xyz
+- Email: zaanetofficial@gmail.com
 
 ---
 
@@ -1689,11 +1059,11 @@ sh /tmp/install/install-zaanet.sh /tmp
 
 ZaaNet has successfully transitioned from concept to production-ready platform through extensive hardware testing, robust software development, and real-world validation with actual users. The choice of OpenWrt routers proved to be the optimal solution, balancing cost, capability, and ease of use.
 
-With 5 active networks serving 210 users and generating $2,100 in revenue during beta testing, the platform demonstrates strong product-market fit in the Ghanaian market. The modular smart contract architecture on Arbitrum provides a secure, scalable foundation for growth.
+The platform demonstrates strong product-market fit in the Ghanaian market. The modular smart contract architecture on Arbitrum provides a secure, scalable foundation for growth.
 
 The comprehensive testing phase revealed and resolved critical issues, resulting in a stable platform with 97.5% uptime and 96.7% transaction success rate. The user experience has been validated through positive feedback and high ratings (4.4/5.0 average).
 
-Looking forward, ZaaNet is positioned for rapid expansion across Africa and beyond, with a clear roadmap for mobile apps, additional features, and geographic growth. The platform's success validates the vision of democratizing internet access through blockchain technology and decentralized infrastructure.
+Looking forward, ZaaNet is positioned for rapid expansion, with a clear roadmap for additional features, and geographic growth. The platform's success validates the vision of democratizing internet access through blockchain technology and decentralized infrastructure.
 
 ---
 
@@ -1701,48 +1071,3 @@ Looking forward, ZaaNet is positioned for rapid expansion across Africa and beyo
 **Date:** February 2025  
 **Version:** 2.0  
 **Status:** Production Live on Arbitrum One
-
----
-
-## Visual Assets Needed
-
-For the final report, please add:
-
-1. **Screenshots:**
-   - [ ] Home page (zaanet.xyz)
-   - [ ] Network map with markers
-   - [ ] Voucher purchase flow
-   - [ ] Wallet connection
-   - [ ] Success confirmation
-   - [ ] Captive portal splash page
-   - [ ] Session dashboard
-   - [ ] Host dashboard
-   - [ ] Admin dashboard
-   - [ ] Router installation (physical setup)
-
-2. **Charts/Graphs:**
-   - [ ] Growth trends (weekly sessions)
-   - [ ] Revenue breakdown
-   - [ ] Geographic distribution
-   - [ ] User acquisition sources
-   - [ ] Session duration distribution
-   - [ ] Network performance matrix
-
-3. **Diagrams:**
-   - [ ] System architecture (already included)
-   - [ ] User flow (already included)
-   - [ ] Hardware evolution timeline (already included)
-   - [ ] Smart contract interactions (already included)
-
-4. **Photos:**
-   - [ ] GL-XE300 router (physical device)
-   - [ ] Router installation setup
-   - [ ] Active deployment in Ghana
-   - [ ] Users connecting to network
-   - [ ] Host dashboard on laptop/phone
-
-Would you like me to:
-1. Create mockups for any missing screenshots?
-2. Generate specific charts/graphs with your actual data?
-3. Expand any particular section?
-4. Add more technical details in appendices?
