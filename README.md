@@ -233,70 +233,103 @@ We discovered that OpenWrt is an open-source Linux distribution for routers: dev
 | **Phase 3B** | TP-Link/Netgear | None | $30-80 | Familiar, available | Locked firmware | - Rejected |
 | **Phase 4** | **GL.iNet GL-XE300** | **None needed** | **$126** | **OpenWrt, all-in-one, reliable, 10+ users** | Learning curve for setup | ✅ **SELECTED** |
 
-### 2.5 Cost Comparison Analysis
 
-**Real Cost of Failed Approaches:**
+## 2.5 Cost Comparison & Hardware R&D Analysis
 
-```
-Phase 1 - Raspberry Pi Full Setup:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Raspberry Pi 4 (4GB)              $55
-ASUS AC-1200 WiFi USB Adapter     $35
-TP-Link USB-to-Ethernet           $15
-Multi-port Ethernet Hub           $20
-Powered USB Hub                   $18
-Adequate Power Supply             $12
-Cooling (heatsink + fan)          $8
-Protective Case                   $7
-SD Card (64GB)                    $10
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-TOTAL PER UNIT:                   $180
+### Evolution of Hardware Strategy
 
-Issues: Too expensive, too complex,
-        unreliable, <6 concurrent users
+During Milestone 2, ZaaNet evaluated multiple hardware architectures before finalizing a production-ready OpenWRT-based deployment model.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The early approach relied on modular Raspberry Pi configurations. While technically functional, this architecture proved cost-inefficient and operationally complex.
 
-Phase 4 - GL.iNet OpenWrt Router:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-GL.iNet GL-XE300                  $126
-Additional accessories            $0
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-TOTAL PER UNIT:                   $126
+---
 
-Benefits: ✅ 30% cost reduction (vs $180 Pi setup)
-         ✅ All-in-one solution
-         ✅ 10+ concurrent users
-         ✅ Production stable
-         ✅ Easy to deploy
-```
+## Phase 1 – Modular Raspberry Pi Architecture (Exploratory R&D)
 
-**Money Spent on Hardware R&D:**
+**Estimated Direct Hardware Cost (per unit):**
 
 ```
-Total Investment in Testing:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-5x Raspberry Pi units          $375
-6x WiFi USB adapters          $180
-4x USB-Ethernet adapters      $60
-2x Multi-port Ethernet hubs   $40
-3x ESP32 dev boards           $30
-2x Consumer routers           $80
-Cables, cases, cooling        $100
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Total Hardware R&D:           $865
-
-Final Solution (GL.iNet):
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1x GL.iNet GL-XE300           $126
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-ROI: $865 invested in R&D
-     → Found $126 production unit (all-in-one)
-     → 30% cheaper than Pi setup ($180 → $126)
-     → 10x more reliable
-     → Ready for production
+Raspberry Pi 4 (4GB)              ~$55
+WiFi USB Adapter                  ~$35
+USB-to-Ethernet Adapter           ~$15
+Ethernet Hub                      ~$20
+Powered USB Hub                   ~$18
+Power Supply                      ~$12
+Cooling & Case                    ~$15
+Storage (SD Card)                 ~$10
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Estimated Total per Unit:         ~$180
 ```
+
+### Observed Limitations
+
+* High component dependency (multiple failure points)
+* Increased wiring and power complexity
+* Reduced field reliability
+* Limited concurrent session stability (<6 users)
+* Higher deployment friction for non-technical hosts
+
+This architecture was suitable for experimentation but not scalable deployment.
+
+---
+
+## Final Architecture – Integrated OpenWRT Router
+
+**Production Hardware Selected: GL.iNet GL-XE300**
+
+```
+GL.iNet GL-XE300 Router           ~$126
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Estimated Production Unit Cost:   ~$126
+```
+
+### Benefits of Integrated Router Model
+
+* ~30% reduction vs modular Pi setup
+* Single-device architecture (no external adapters)
+* Lower power consumption
+* Improved field stability
+* 10+ concurrent users supported
+* Faster installation and provisioning
+* Lower failure surface area
+
+This transition significantly improved deployability and long-term scalability.
+
+---
+
+# Hardware Research & Development Investment
+
+The Raspberry Pi phase represented structured engineering exploration, not waste.
+
+Below reflects **direct hardware procurement only** (excluding shipping, import duties, replacement components, and untracked logistics expenses).
+
+```
+Raspberry Pi units (multiple)         ~$375
+WiFi adapters (various models)        ~$180
+USB-Ethernet adapters                 ~$60
+Ethernet hubs                         ~$40
+ESP32 development boards              ~$30
+Consumer routers (testing)            ~$80
+Cables, cases, cooling, misc          ~$100
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Estimated Direct Hardware R&D:        ~$865
+```
+
+> Note: Actual total expenditure exceeded this figure due to logistics, shipping, import fees, component replacement, and experimental iterations not individually tracked.
+
+---
+
+## Outcome of R&D Investment
+
+The $865+ invested in hardware exploration resulted in:
+
+* Identification of an optimized $126 production unit
+* Elimination of unnecessary modular components
+* 30% reduction in per-unit deployment cost
+* 10x improvement in operational simplicity
+* Production-ready, field-deployable architecture
+
+Rather than incremental tuning, this R&D phase enabled a full architectural pivot toward a lean, scalable deployment model.
 
 ### 2.6 Lessons Learned
 
